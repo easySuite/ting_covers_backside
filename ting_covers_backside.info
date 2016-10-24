@@ -1,0 +1,10 @@
+name = Ting covers backside
+description = Displays covers for Ting objects and collections
+package = Ding!
+core = 7.x
+version = "7.x-0.1"
+dependencies[] = ting
+dependencies[] = ting_covers
+dependencies[] = ting_covers_addi
+files[] = lib/addi-client-backside/AdditionalInformationBackside.php
+files[] = lib/addi-client-backside/AdditionalInformationBacksideService.php
