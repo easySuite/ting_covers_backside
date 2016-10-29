@@ -43,5 +43,11 @@
       var local_id = reg_exp.exec($(modal).attr('id'))[0];
       $(backside_popup_data[local_id]).appendTo($(modal).find('.reveal-cover-back-image'));
     });
+
+
+    $('.reveal-cover').click(function (event) {
+      event.preventDefault();
+      console.log($(this).attr('data-reveal-id'))
+    });
   });
 }(jQuery));
