@@ -1,8 +1,6 @@
 (function($) {
   "use strict";
 
-  var backside_popup_data = {};
-
   // Helper function to get information about a given cover place holder.
   var ting_covers_backside_extract_data = function(e) {
     return {
@@ -15,39 +13,32 @@
     var cover_data = [];
 
     // Extract cover information from the dom.
-    $('.ting-cover').each(function(index, element) {
+    $('.ting-cover:not(.ting-backover-processed)').each(function(index, element) {
       cover_data.push(ting_covers_backside_extract_data(element));
     });
 
-    $.ajax({
-      url: Drupal.settings.basePath + 'ting/covers/backside',
-      type: 'POST',
-      data: {
-        coverData: cover_data
-      },
-      dataType: 'json',
-      success: function (coverData) {
-        $.each(coverData, function(local_id, data) {
-          var $cover_wrapper = $('.ting-cover-object-id-' + local_id).parents('.work-cover');
-          $(data.link).appendTo($cover_wrapper.find('.work-cover-selector'));
-          backside_popup_data[local_id] = data.popup.data;
-          $(data.popup.wrapper).appendTo($cover_wrapper.parent());
-        });
-      }
-    });
-
-    // Load PDF file on modal open.
-    $(document).on('reveal:open', 'div[id^="reveal-cover-back-"]', function () {
-      var modal = $(this);
-      var reg_exp = /\d+/;
-      var local_id = reg_exp.exec($(modal).attr('id'))[0];
-      $(backside_popup_data[local_id]).appendTo($(modal).find('.reveal-cover-back-image'));
-    });
-
+    if (cover_data.length > 0) {
+      $.ajax({
+        url: Drupal.settings.basePath + 'ting/covers/backside',
+        type: 'POST',
+        data: {
+          coverData: cover_data
+        },
+        dataType: 'json',
+        success: function (coverData) {
+          $.each(coverData, function(id, data) {
+            var $current = $('#work-cover-' + id).parent();
+            $current.html('');
+            $(data.data).appendTo($current);
+          });
+        }
+      });
+    }
 
     $('.reveal-cover').click(function (event) {
       event.preventDefault();
-      console.log($(this).attr('data-reveal-id'))
+      var reveal_obj = $(this).attr('data-reveal-id');
+      $('.' + reveal_obj).reveal();
     });
   });
 }(jQuery));
