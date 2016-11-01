@@ -14,10 +14,16 @@ class AdditionalInformationBacksideService extends AdditionalInformationService 
   protected $group;
   protected $password;
 
+  /**
+   * Instantiate the addi client.
+   */
   public function __construct($wsdl_url, $username, $group, $password) {
     parent::__construct($wsdl_url, $username, $group, $password);
   }
 
+  /**
+   * Extract the data we need from the server response.
+   */
   protected function extractAdditionalInformation($id_name, $response) {
     $additional_informations = array();
 
