@@ -28,6 +28,7 @@
         success: function (coverData) {
           $.each(coverData, function(id, data) {
             var $current = $('#work-cover-' + id).parent();
+
             $current.html('');
             $(data.data).appendTo($current);
           });
@@ -35,10 +36,9 @@
       });
     }
 
-    $('.reveal-cover').click(function (event) {
-      event.preventDefault();
-      var reveal_obj = $(this).attr('data-reveal-id');
-      $('.' + reveal_obj).reveal();
+    // Load PDF file on modal open.
+    $(document).on('reveal:open', '.reveal-modal', function () {
+      $(this).find('object').show();
     });
   });
 }(jQuery));
