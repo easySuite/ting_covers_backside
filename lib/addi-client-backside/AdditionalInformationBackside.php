@@ -5,7 +5,7 @@
  * AdditionalInformationBackside class.
  */
 
-class AdditionalInformationBackside{
+class AdditionalInformationBackside {
 
   public $backsideUri;
 
