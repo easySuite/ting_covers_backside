@@ -473,6 +473,9 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
     '#href' => '',
     '#options' => $options,
   );
+  $variables['elements']['#close_button'] = array(
+    '#markup' => '<a class="reveal-cover close-reveal-modal">&#215;</a>',
+  );
 }
 
 /**
