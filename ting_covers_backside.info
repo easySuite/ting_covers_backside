@@ -1,0 +1,6 @@
+name = Ting covers backside
+description = Displays back covers for Ting objects and collections
+package = Ding!
+core = 7.x
+version = "7.x-0.22"
+dependencies[] = ting_covers
