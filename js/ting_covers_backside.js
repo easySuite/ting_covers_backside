@@ -9,6 +9,13 @@
   };
 
   $(document).ready(function () {
+    // Don't show ting search overlay when covers opens in popup.
+    $('body').on('click', 'a.reveal-cover', function () {
+      var reveal_id = $(this).attr('data-reveal-id');
+      $('#' + reveal_id).reveal();
+      return false;
+    });
+
     // Assemble information regarding covers.
     var cover_data = [];
 
