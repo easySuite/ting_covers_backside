@@ -19,9 +19,13 @@
     var cover_data = [];
 
     // Extract cover information from the dom.
-    $('.ting-cover').each(function(index, element) {
+    $('div.ting-cover:not(.ting-backside-processed)').each(function(index, element) {
       cover_data.push(ting_covers_backside_extract_data(element));
     });
+
+    if (cover_data.length === 0) {
+      return false;
+    }
 
     $.ajax({
       url: Drupal.settings.basePath + 'ting/covers/backside',
@@ -31,21 +35,18 @@
       },
       dataType: 'json',
       success: function (coverData) {
-        $.each(coverData, function(local_id, data) {
-          var $cover_wrapper = $('.ting-cover-object-id-' + local_id).parents('.work-cover');
-          $(data.link).appendTo($cover_wrapper.find('.work-cover-selector'));
-          backside_popup_data[local_id] = data.popup.data;
-          $(data.popup.wrapper).appendTo($cover_wrapper.parent());
+        $.each(coverData, function(id, data) {
+          var $current = $('#work-cover-' + id).parent();
+
+          $current.html('');
+          $(data.data).appendTo($current);
         });
       }
     });
 
     // Load PDF file on modal open.
     $(document).on('reveal:open', 'div[id^="reveal-cover-back-"]', function () {
-      var modal = $(this);
-      var reg_exp = /\d+/;
-      var local_id = reg_exp.exec($(modal).attr('id'))[0];
-      $(backside_popup_data[local_id]).appendTo($(modal).find('.reveal-cover-back-image'));
+      $(this).find('object').show();
     });
   });
 }(jQuery));
