@@ -41,8 +41,6 @@ class AdditionalInformationBacksideService extends AdditionalInformationService 
       $back_page = isset($info->backPage->_) ? $info->backPage->_ : FALSE;
 
       if (isset($info->identifierKnown) && $info->identifierKnown && $cover_image && $back_page) {
-//        dump($back_page);
-//        exit;
         $additional_info = new AdditionalInformationBackside($back_page);
         $additional_informations[$info->identifier->{$id_name}] = $additional_info;
       }
