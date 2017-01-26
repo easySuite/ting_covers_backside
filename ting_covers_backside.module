@@ -230,6 +230,7 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
   );
 
   if ($cover_file_path) {
+    $cover_file = image_style_url($image_style, $cover_file_path);
     $alt = '';
     if (isset($object->creators)) {
       $alt = implode(', ', $object->creators);
@@ -257,13 +258,11 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
     $variables['elements']['#no_image_style'] = '';
     // Front cover image (shown in modal window).
     $variables['elements']['#front_cover_large_image'] = array(
-      '#theme' => 'image_style',
-      '#path' => $cover_file_path,
-      '#style_name' => 'ting_cover_large',
-      '#attributes' => array(
-        'alt' => $alt,
-        'title' => t('large cover image', array(), array('context' => 'ting_covers')),
-      ),
+      '#markup' =>
+        '<object data="' . $cover_file . '?page=1&amp;view=Fit" width="590" height="925" style="display:none;">
+            <p>It appears you don\'t have a PDF plugin for this browser.
+            No biggie... you can <a href="' . $cover_file . '">click here to download the PDF file.</a></p>
+          </object>',
     );
 
     // Back cover pdf object (shown in modal window).
@@ -275,9 +274,6 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
             <p>It appears you don\'t have a PDF plugin for this browser.
             No biggie... you can <a href="' . $backcover_uri . '">click here to download the PDF file.</a></p>
           </object>',
-        '#attributes' => array(
-          'style' => 'display:none;',
-        ),
       );
     }
 
