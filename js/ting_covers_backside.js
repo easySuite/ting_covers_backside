@@ -17,8 +17,8 @@
         };
       };
 
-      // Load PDF file on modal open.
-      $(document).on('reveal:open', 'div[id^="reveal-cover-back-"]', function () {
+      // Load PDF or image file on modal open.
+      $(document).on('reveal:open', 'div[id^="reveal-cover-back-"], div[id^="reveal-cover-large-"]', function () {
         $(this).find('object').show();
       });
 
