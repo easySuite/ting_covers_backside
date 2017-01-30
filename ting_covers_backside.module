@@ -17,7 +17,55 @@ function ting_covers_backside_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['ting/covers/backside/%/%'] = array(
+    'title' => 'Get resource for popup',
+    'page callback' => 'ting_covers_backside_get_object',
+    'page arguments' => array(3, 4),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
+}
+
+/**
+ * Render proper element for popup.
+ *
+ * @param string $object_id
+ * @param string $object_type
+ * @param string $image_style
+ *
+ * @internal param $obj_type
+ */
+function ting_covers_backside_get_object($object_id, $object_type, $image_style = 'ding_list_medium') {
+  if ($object_type == 'front_cover') {
+    $cover_file_path = ting_covers_object_path($object_id);
+    $cover_file = image_style_url($image_style, $cover_file_path);
+
+    $render = array(
+      '#theme' => 'image',
+      '#path' => $cover_file,
+    );
+
+    $output = drupal_render($render);
+  }
+  else {
+    $backcoverpdf_file_path = ting_covers_backside_object_path($object_id);
+    $wrapper = file_stream_wrapper_get_instance_by_uri($backcoverpdf_file_path);
+    $backcover_uri = $wrapper->getExternalUrl();
+
+    $render = array(
+      '#markup' => '<object data="' . $backcover_uri . '?page=1&amp;view=Fit" type="application/pdf" width="590" height="925">
+            <p>It appears you don\'t have a PDF plugin for this browser.
+            No biggie... you can <a href="' . $backcover_uri . '">click here to download the PDF file.</a></p>
+          </object>'
+    );
+
+    $output = drupal_render($render);
+  }
+
+  drupal_json_output($output);
+  return;
 }
 
 /**
@@ -89,12 +137,13 @@ function _ting_covers_backside_delete_old_files($time = NULL) {
 
 /**
  * Implements hook_preprocess_HOOK().
+ *
+ * @param $variables
  */
 function ting_covers_backside_preprocess_field(&$variables) {
   if ($variables['element']['#field_type'] == 'ting_cover') {
     $module_path = drupal_get_path('module', 'ting_covers_backside');
     $variables['items'][0]['#attached']['js'][] = $module_path . '/js/ting_covers_backside.js';
-    $variables['items'][0]['#attached']['js'][] = $module_path . '/js/jquery.reveal.js';
     $variables['items'][0]['#attached']['css'][] = $module_path . '/css/reveal.css';
   }
 }
@@ -194,7 +243,7 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
   );
   // Set initial values required by the template, and check if there's an image available locally.
   $cover_file_path = FALSE;
-  $backcoverpdf_file_path = $backcoverpdf_local_id = FALSE;
+  $backcoverpdf_file_path = FALSE;
   $variables['elements']['#classes'] = array(
     'ting-cover',
     'ting-cover-style-' . $image_style,
@@ -230,7 +279,6 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
   );
 
   if ($cover_file_path) {
-    $cover_file = image_style_url($image_style, $cover_file_path);
     $alt = '';
     if (isset($object->creators)) {
       $alt = implode(', ', $object->creators);
@@ -256,24 +304,27 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
       ),
     );
     $variables['elements']['#no_image_style'] = '';
-    // Front cover image (shown in modal window).
+    // Info for front cover file.
     $variables['elements']['#front_cover_large_image'] = array(
-      '#markup' =>
-        '<object data="' . $cover_file . '?page=1&amp;view=Fit" width="590" height="925" style="display:none;">
-            <p>It appears you don\'t have a PDF plugin for this browser.
-            No biggie... you can <a href="' . $cover_file . '">click here to download the PDF file.</a></p>
-          </object>',
+      '#type' => 'html_tag',
+      '#tag' => 'span',
+      '#attributes' => array(
+        'object_type' => 'front_cover',
+        'object_id' => $local_id,
+        'style' => 'display:none',
+      ),
     );
 
-    // Back cover pdf object (shown in modal window).
-    if ($wrapper = file_stream_wrapper_get_instance_by_uri($backcoverpdf_file_path)) {
-      $backcover_uri = $wrapper->getExternalUrl();
+    // Info for back cover file.
+    if ($backcoverpdf_file_path) {
       $variables['elements']['#back_cover_large_pdf'] = array(
-        '#markup' =>
-          '<object data="' . $backcover_uri . '?page=1&amp;view=Fit" type="application/pdf" width="590" height="925" style="display:none;">
-            <p>It appears you don\'t have a PDF plugin for this browser.
-            No biggie... you can <a href="' . $backcover_uri . '">click here to download the PDF file.</a></p>
-          </object>',
+        '#type' => 'html_tag',
+        '#tag' => 'span',
+        '#attributes' => array(
+          'object_type' => 'back_cover',
+          'object_id' => $local_id,
+          'style' => 'display:none',
+        ),
       );
     }
 

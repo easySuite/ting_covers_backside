@@ -18,8 +18,27 @@
       };
 
       // Load PDF or image file on modal open.
-      $(document).on('reveal:open', 'div[id^="reveal-cover-back-"], div[id^="reveal-cover-large-"]', function () {
-        $(this).find('object').show();
+      $(document).on('reveal:open', 'div[id^="reveal-cover-back-"], div[id^="reveal-cover-large-"]', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        var $obj_type = $(this).find('span').attr('object_type');
+        var $obj_id = $(this).find('span').attr('object_id');
+
+        var backend_uri = ($obj_type == 'front_cover')
+          ? Drupal.settings.basePath + 'ting/covers/backside/' + $obj_id + '/' + $obj_type + '/' + $('.ting-cover-object-id-' + $obj_id).attr('class').match(/ting-cover-style-(\S+)/)[1]
+          : Drupal.settings.basePath + 'ting/covers/backside/' + $obj_id + '/' + $obj_type;
+
+        var $modal = $(this).find('div[class^="reveal-cover-"]');
+
+        $.ajax({
+          url: backend_uri,
+          type: 'GET',
+          dataType: 'json',
+          success: function (data) {
+            $(data).appendTo($modal);
+          }
+        });
       });
 
       // Assemble information regarding covers.
