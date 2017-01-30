@@ -4,8 +4,6 @@
   Drupal.behaviors.backside = {
     attach: function(context) {
 
-      var backside_popup_data = {};
-
       // Helper function to get information about a given cover place holder.
       var ting_covers_backside_extract_data = function(e) {
         var classname = $(e).attr('class');
@@ -22,6 +20,12 @@
         e.stopPropagation();
         e.preventDefault();
 
+        if ($(this).find('div span').length === 0) {
+          return false;
+        }
+
+        var $modal = $(this).find('div[class^="reveal-cover-"]');
+
         var $obj_type = $(this).find('span').attr('object_type');
         var $obj_id = $(this).find('span').attr('object_id');
 
@@ -29,14 +33,13 @@
           ? Drupal.settings.basePath + 'ting/covers/backside/' + $obj_id + '/' + $obj_type + '/' + $('.ting-cover-object-id-' + $obj_id).attr('class').match(/ting-cover-style-(\S+)/)[1]
           : Drupal.settings.basePath + 'ting/covers/backside/' + $obj_id + '/' + $obj_type;
 
-        var $modal = $(this).find('div[class^="reveal-cover-"]');
-
         $.ajax({
           url: backend_uri,
           type: 'GET',
           dataType: 'json',
           success: function (data) {
             $(data).appendTo($modal);
+            $($modal).find('span').remove();
           }
         });
       });
