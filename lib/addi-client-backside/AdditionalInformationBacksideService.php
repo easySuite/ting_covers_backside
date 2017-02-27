@@ -15,22 +15,6 @@ class AdditionalInformationBacksideService extends AdditionalInformationService 
   protected $password;
 
   /**
-   * Get information by local ID and library code.
-   *
-   * @param mixed $local_id
-   *   Expects either a single object with localIdentifier and libraryCode
-   *   attributes, or an array of such objects.
-   *
-   * @return array
-   *   Array of the images that were found.
-   */
-  public function getByLocalIdentifier($local_id) {
-    $identifiers = $this->collectIdentifiers('localIdentifier', $local_id);
-    $response = $this->sendRequest($identifiers);
-    return $this->extractAdditionalInformation('localIdentifier', $response);
-  }
-
-  /**
    * Extract the data we need from the server response.
    */
   protected function extractAdditionalInformation($id_name, $response) {
@@ -42,7 +26,7 @@ class AdditionalInformationBacksideService extends AdditionalInformationService 
 
       if (isset($info->identifierKnown) && $info->identifierKnown && $cover_image && $back_page) {
         $additional_info = new AdditionalInformationBackside($back_page);
-        $additional_informations[$info->identifier->{$id_name}] = $additional_info;
+        $additional_informations[$info->identifier->$id_name] = $additional_info;
       }
     }
 

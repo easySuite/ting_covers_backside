@@ -1,61 +1,30 @@
 (function($) {
   "use strict";
 
-  Drupal.behaviors.backside = {
-    attach: function(context) {
+  // Helper function to get information about a given cover place holder.
+  var ting_covers_backside_extract_data = function(e) {
+    return {
+      id : $(e).data('ting-cover-object-id')
+    };
+  };
 
-      // Helper function to get information about a given cover place holder.
-      var ting_covers_backside_extract_data = function(e) {
-        var classname = $(e).attr('class');
-        var imageStyle = classname.match(/ting-cover-style-(\S+)/);
-        var id = classname.match(/ting-cover-object-id-(\S+)/);
-        return {
-          local_id : id[1],
-          image_style : imageStyle[1]
-        };
-      };
+  $(document).ready(function () {
+    // Don't show ting search overlay when covers opens in popup.
+    $('body').on('click', 'a.reveal-cover', function () {
+      var reveal_id = $(this).attr('data-reveal-id');
+      $('#' + reveal_id).reveal();
+      return false;
+    });
 
-      // Load PDF or image file on modal open.
-      $(document).on('reveal:open', 'div[id^="reveal-cover-back-"], div[id^="reveal-cover-large-"]', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
+    // Assemble information regarding covers.
+    var cover_data = [];
 
-        if ($(this).find('div span').length === 0) {
-          return false;
-        }
+    // Extract cover information from the dom.
+    $('.ting-cover:not(.ting-backover-processed)').each(function(index, element) {
+      cover_data.push(ting_covers_backside_extract_data(element));
+    });
 
-        var $modal = $(this).find('div[class^="reveal-cover-"]');
-
-        var $obj_type = $(this).find('span').attr('object_type');
-        var $obj_id = $(this).find('span').attr('object_id');
-
-        var backend_uri = ($obj_type == 'front_cover')
-          ? Drupal.settings.basePath + 'ting/covers/backside/' + $obj_id + '/' + $obj_type + '/' + $('.ting-cover-object-id-' + $obj_id).attr('class').match(/ting-cover-style-(\S+)/)[1]
-          : Drupal.settings.basePath + 'ting/covers/backside/' + $obj_id + '/' + $obj_type;
-
-        $.ajax({
-          url: backend_uri,
-          type: 'GET',
-          dataType: 'json',
-          success: function (data) {
-            $(data).appendTo($modal);
-            $($modal).find('span').remove();
-          }
-        });
-      });
-
-      // Assemble information regarding covers.
-      var cover_data = [];
-
-      // Extract cover information from the dom.
-      $('div.ting-cover:not(.ting-backside-processed)').each(function(index, element) {
-        cover_data.push(ting_covers_backside_extract_data(element));
-      });
-
-      if (cover_data.length === 0) {
-        return false;
-      }
-
+    if (cover_data.length > 0) {
       $.ajax({
         url: Drupal.settings.basePath + 'ting/covers/backside',
         type: 'POST',
@@ -73,5 +42,10 @@
         }
       });
     }
-  };
+
+    // Load PDF file on modal open.
+    $(document).on('reveal:open', '.reveal-modal', function () {
+      $(this).find('object').show();
+    });
+  });
 }(jQuery));
