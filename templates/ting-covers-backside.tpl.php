@@ -19,7 +19,7 @@
       <?php print $close_button; ?>
   </div>
 
-  <div id="reveal-cover-back-<?php print $entity_id; ?>" class="reveal-modal reveal-cover-back" data-reveal="">
+  <div id="reveal-cover-back-<?php print $entity_id; ?>" class="reveal-modal reveal-cover-back" data-hash="<?php print $entity_id; ?>" data-reveal="">
     <div class="reveal-cover-back-image"><?php print $back_cover_large_pdf; ?></div>
       <?php print $close_button; ?>
   </div>
