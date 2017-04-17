@@ -8,3 +8,4 @@ dependencies[] = ting_covers
 dependencies[] = ting_covers_addi
 files[] = lib/addi-client-backside/AdditionalInformationBackside.php
 files[] = lib/addi-client-backside/AdditionalInformationBacksideService.php
+scripts[] = js/pdfobject.min.js
