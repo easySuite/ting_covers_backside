@@ -1,3 +1,6 @@
+core = 7.x
+api = 2
+
 ; Mozilla PDF.js library
 libraries[pdfjs][destination] = "libraries"
 libraries[pdfjs][directory_name] = "pdfjs"
