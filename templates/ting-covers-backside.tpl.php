@@ -14,7 +14,7 @@
     <?php print $back_cover_large_link; ?>
   </div>
 
-  <div id="reveal-cover-large-<?php print $entity_id; ?>" class="reveal-modal reveal-cover-large" data-reveal="">
+  <div id="reveal-cover-large-<?php print $entity_id; ?>" class="reveal-modal reveal-cover-large" data-cover-hash="<?php print $entity_id; ?>" data-reveal="">
     <div class="reveal-cover-large-image"><?php print $front_cover_large_image; ?></div>
       <?php print $close_button; ?>
   </div>

@@ -43,6 +43,7 @@
 
       // Load PDF file on modal open.
       $(document).on('reveal:open', '.reveal-modal', function () {
+        var wrapper;
         var hash = $(this).data('hash');
         var uri = $(this).children().children().data('uri');
 
@@ -63,11 +64,18 @@
             options.PDFJS_URL = Drupal.settings.basePath + 'profiles/ding2/libraries/pdfjs/web/viewer.html';
           }
 
-          var wrapper = $('#reveal-cover-back-' + hash + ' .reveal-cover-back-image');
+          wrapper = $('#reveal-cover-back-' + hash + ' .reveal-cover-back-image');
           PDFObject.embed(uri, wrapper, options);
+        }
+        else {
+          var cover_hash = $(this).data('cover-hash');
+          var cover_uri = $(this).parent().find('a.ting-cover').data('uri');
+          var image = '<img src="' + cover_uri + '">';
+
+          wrapper = $('#reveal-cover-large-' + cover_hash + ' .reveal-cover-large-image');
+          $(wrapper).once().append(image);
         }
       });
     }
-
   });
 }(jQuery));
