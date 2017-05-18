@@ -371,6 +371,10 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
     'data-uri' => image_style_url('ting_cover_large', $path),
   );
 
+  if ($cover_file_path != FALSE) {
+    $image_attributes['data-uri'] = image_style_url('ting_cover_large', $cover_file_path);
+  }
+
   $image_attributes = array_merge($image_attributes, $attrs);
 
   // Default link if there's no covers cached.
