@@ -16,6 +16,14 @@ function ting_covers_backside_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['admin/config/ting/covers/backside'] = array(
+    'title' => 'Backside',
+    'description' => 'Configure how covers backside are handled.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ting_covers_backside_admin_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'ting_covers_backside.admin.inc',
+  );
 
   return $items;
 }
@@ -418,15 +426,18 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
       ),
     );
 
-    $variables['elements']['#front_cover_large_image'] = array(
-      '#markup' => '<div data-uri="' . $large_cover_uri . '"></div>',
-    );
-
-    if ($wrapper = file_stream_wrapper_get_instance_by_uri($backcoverpdf_file_path)) {
-      $backcover_uri = $wrapper->getExternalUrl();
-      $variables['elements']['#back_cover_large_pdf'] = array(
-        '#markup' => '<div data-uri="' . $backcover_uri . '" width="590" height="925"></div>',
+    // Add element to DOM only if selected image styles are used.
+    if (in_array($variables['image_style'], array('ting_cover_medium', 'ting_cover_small'))) {
+      $variables['elements']['#front_cover_large_image'] = array(
+        '#markup' => '<div data-uri="' . $large_cover_uri . '"></div>',
       );
+
+      if ($wrapper = file_stream_wrapper_get_instance_by_uri($backcoverpdf_file_path)) {
+        $backcover_uri = $wrapper->getExternalUrl();
+        $variables['elements']['#back_cover_large_pdf'] = array(
+          '#markup' => '<div data-uri="' . $backcover_uri . '" width="590" height="925"></div>',
+        );
+      }
     }
 
     // Avoid further javascript processing.
@@ -464,6 +475,7 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
       'data-reveal-id' => 'reveal-cover-back-' . md5($object->id),
     ),
   );
+
   if (!$backcoverpdf_file_path) {
     $options['attributes']['style'] = 'display:none';
   }
