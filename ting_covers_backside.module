@@ -21,8 +21,9 @@ function ting_covers_backside_menu() {
     'description' => 'Configure how covers backside are handled.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ting_covers_backside_admin_settings_form'),
-    'access arguments' => array('administer site configuration'),
+    'access arguments' => array('administer ting settings'),
     'file' => 'ting_covers_backside.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;
@@ -350,6 +351,7 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
   $backcoverpdf_file_path = FALSE;
   $object = $variables['object'] = $variables['elements']['#object'];
   $variables['image_style'] = $image_style = $variables['elements']['#image_style'];
+  $display_modal = in_array($variables['image_style'], array_filter(variable_get('ting_backside_covers_modes', [])));
 
   // Set initial values required by the template.
   $variables['classes'] = array(
@@ -427,7 +429,7 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
     );
 
     // Add element to DOM only if selected image styles are used.
-    if (in_array($variables['image_style'], array('ting_cover_medium', 'ting_cover_small'))) {
+    if ($display_modal) {
       $variables['elements']['#front_cover_large_image'] = array(
         '#markup' => '<div data-uri="' . $large_cover_uri . '"></div>',
       );
@@ -459,13 +461,16 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
   if (!$backcoverpdf_file_path) {
     $options['attributes']['style'] = 'display:none';
   }
-  $variables['elements']['#front_cover_large_link'] = array(
-    '#type' => 'link',
-    '#title' => '',
-    '#href' => '',
-    '#options' => $options,
-  );
+  if ($display_modal) {
+    $variables['elements']['#front_cover_large_link'] = array(
+      '#type' => 'link',
+      '#title' => '',
+      '#href' => '',
+      '#options' => $options,
+    );
+  }
 
+  // Backside cover modal window.
   $options = array(
     'html' => FALSE,
     'attributes' => array(
@@ -479,12 +484,15 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
   if (!$backcoverpdf_file_path) {
     $options['attributes']['style'] = 'display:none';
   }
-  $variables['elements']['#back_cover_large_link'] = array(
-    '#type' => 'link',
-    '#title' => '',
-    '#href' => '',
-    '#options' => $options,
-  );
+
+  if ($display_modal) {
+    $variables['elements']['#back_cover_large_link'] = array(
+      '#type' => 'link',
+      '#title' => '',
+      '#href' => '',
+      '#options' => $options,
+    );
+  }
   $variables['elements']['#close_button'] = array(
     '#markup' => '<a class="reveal-cover close-reveal-modal">&#215;</a>',
   );
