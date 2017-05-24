@@ -351,7 +351,7 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
   $backcoverpdf_file_path = FALSE;
   $object = $variables['object'] = $variables['elements']['#object'];
   $variables['image_style'] = $image_style = $variables['elements']['#image_style'];
-  $display_modal = in_array($variables['image_style'], array_filter(variable_get('ting_backside_covers_modes', [])));
+  $display_modal = FALSE;
 
   // Set initial values required by the template.
   $variables['classes'] = array(
@@ -428,6 +428,7 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
       ),
     );
 
+    $display_modal = in_array($variables['image_style'], array_filter(variable_get('ting_backside_covers_modes', [])));
     // Add element to DOM only if selected image styles are used.
     if ($display_modal) {
       $variables['elements']['#front_cover_large_image'] = array(
