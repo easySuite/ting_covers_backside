@@ -7,7 +7,6 @@
 function ting_covers_backside_admin_settings_form() {
   $form = array();
 
-  $image_styles = image_styles();
   $styles = array();
   $instance_info = field_info_instance('ting_object', 'ting_cover', 'ting_object');
   foreach ($instance_info['display'] as $mode_name => $mode) {
