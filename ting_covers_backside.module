@@ -97,19 +97,6 @@ function _ting_covers_backside_delete_old_files($time = NULL) {
 }
 
 /**
- * Implements hook_preprocess_HOOK().
- */
-function ting_covers_backside_preprocess_field(&$variables) {
-  $element = $variables['element'];
-  if ($element['#field_type'] == 'ting_cover' && $element['#view_mode'] !== 'compact') {
-    $module_path = drupal_get_path('module', 'ting_covers_backside');
-    $variables['items'][0]['#attached']['js'][] = $module_path . '/js/ting_covers_backside.js';
-    $variables['items'][0]['#attached']['js'][] = $module_path . '/js/jquery.reveal.js';
-    $variables['items'][0]['#attached']['css'][] = $module_path . '/css/reveal.css';
-  }
-}
-
-/**
  * Menu callback to get backside cover information.
  */
 function ting_covers_backside_objects() {
@@ -431,8 +418,20 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
     $display_modal = in_array($variables['image_style'], array_filter(variable_get('ting_backside_covers_modes', [])));
     // Add element to DOM only if selected image styles are used.
     if ($display_modal) {
+      $module_path = drupal_get_path('module', 'ting_covers_backside');
       $variables['elements']['#front_cover_large_image'] = array(
         '#markup' => '<div data-uri="' . $large_cover_uri . '"></div>',
+        // Attach js only if image style is used.
+        // JS can be attached to another element if this is not needed anymore.
+        '#attached' => array(
+          'js' => array(
+            array('data' => $module_path . '/js/ting_covers_backside.js'),
+            array('data' => $module_path . '/js/jquery.reveal.js'),
+          ),
+          'css' => array(
+            'data' => $module_path . '/css/reveal.css',
+          ),
+        ),
       );
 
       if ($wrapper = file_stream_wrapper_get_instance_by_uri($backcoverpdf_file_path)) {

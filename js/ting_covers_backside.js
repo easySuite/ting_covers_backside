@@ -21,7 +21,7 @@
       var cover_data = [];
 
       // Extract cover information from the dom.
-      $('.ting-cover:not(.ting-backover-processed)').each(function (index, element) {
+      $('.ting-cover:not(.ting-backover-processed)', context).each(function (index, element) {
         cover_data.push(ting_covers_backside_extract_data(element));
       });
 
