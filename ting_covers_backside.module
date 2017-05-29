@@ -355,6 +355,7 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
     $attrs['data-' . $key] = $val;
   }
 
+  // Load front cover.
   $path = ting_covers_object_path($object->id);
   if (file_exists($path)) {
     $cover_file_path = $path;
@@ -367,7 +368,6 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
     'data-reveal-id' => 'reveal-cover-large-' . md5($object->id),
     'data-uri' => image_style_url('ting_cover_large', $path),
   );
-
   if ($cover_file_path != FALSE) {
     $image_attributes['data-uri'] = image_style_url('ting_cover_large', $cover_file_path);
   }
@@ -383,12 +383,6 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
       'attributes' => $image_attributes,
     ),
   );
-
-  $path = ting_covers_backside_object_path($variables['object']->id);
-  if (file_exists($path)) {
-    $backcoverpdf_file_path = $path;
-    $variables['backside_file'] = $backcoverpdf_file_path;
-  }
 
   if ($cover_file_path) {
     $alt = '';
@@ -415,31 +409,12 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
       ),
     );
 
-    $display_modal = in_array($variables['image_style'], array_filter(variable_get('ting_backside_covers_modes', [])));
-    // Add element to DOM only if selected image styles are used.
+    $display_modal = in_array($variables['image_style'], array_filter(variable_get('ting_backside_covers_modes', array())));
     if ($display_modal) {
-      $module_path = drupal_get_path('module', 'ting_covers_backside');
+      // Add element to DOM only if selected image styles are used.
       $variables['elements']['#front_cover_large_image'] = array(
         '#markup' => '<div data-uri="' . $large_cover_uri . '"></div>',
-        // Attach js only if image style is used.
-        // JS can be attached to another element if this is not needed anymore.
-        '#attached' => array(
-          'js' => array(
-            array('data' => $module_path . '/js/ting_covers_backside.js'),
-            array('data' => $module_path . '/js/jquery.reveal.js'),
-          ),
-          'css' => array(
-            'data' => $module_path . '/css/reveal.css',
-          ),
-        ),
       );
-
-      if ($wrapper = file_stream_wrapper_get_instance_by_uri($backcoverpdf_file_path)) {
-        $backcover_uri = $wrapper->getExternalUrl();
-        $variables['elements']['#back_cover_large_pdf'] = array(
-          '#markup' => '<div data-uri="' . $backcover_uri . '" width="590" height="925"></div>',
-        );
-      }
     }
 
     // Avoid further javascript processing.
@@ -458,9 +433,10 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
       'data-uri' => image_style_url('ting_cover_large', $cover_file_path),
     ),
   );
-  if (!$backcoverpdf_file_path) {
-    $options['attributes']['style'] = 'display:none';
+  if (!$cover_file_path) {
+    $options['attributes']['style'] = 'display: none';
   }
+
   if ($display_modal) {
     $variables['elements']['#front_cover_large_link'] = array(
       '#type' => 'link',
@@ -468,6 +444,12 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
       '#href' => '',
       '#options' => $options,
     );
+  }
+
+  $path = ting_covers_backside_object_path($variables['object']->id);
+  if (file_exists($path)) {
+    $backcoverpdf_file_path = $path;
+    $variables['backside_file'] = $backcoverpdf_file_path;
   }
 
   // Backside cover modal window.
@@ -482,10 +464,15 @@ function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
   );
 
   if (!$backcoverpdf_file_path) {
-    $options['attributes']['style'] = 'display:none';
+    $options['attributes']['style'] = 'display: none';
   }
-
   if ($display_modal) {
+    if ($wrapper = file_stream_wrapper_get_instance_by_uri($backcoverpdf_file_path)) {
+      $backcover_uri = $wrapper->getExternalUrl();
+      $variables['elements']['#back_cover_large_pdf'] = array(
+        '#markup' => '<div data-uri="' . $backcover_uri . '" width="590" height="925"></div>',
+      );
+    }
     $variables['elements']['#back_cover_large_link'] = array(
       '#type' => 'link',
       '#title' => '',
@@ -526,4 +513,20 @@ function ting_covers_backside_ting_object_cover($variables) {
   $markup = theme('ting_object_backside', $template_vars);
 
   return $markup;
+}
+
+/**
+ * Implements hook_field_display_alter().
+ */
+function ting_covers_backside_field_display_alter(&$display, $context) {
+  $display_modal = FALSE;
+  if (!empty($display['settings']['image_style'])) {
+    $display_modal = in_array($display['settings']['image_style'], array_filter(variable_get('ting_backside_covers_modes', array())));
+  }
+  if ($context['field']['field_name'] == 'ting_cover' && $display_modal) {
+    $module_path = drupal_get_path('module', 'ting_covers_backside');
+    drupal_add_js($module_path . '/js/ting_covers_backside.js');
+    drupal_add_js($module_path . '/js/jquery.reveal.js');
+    drupal_add_css($module_path . '/css/reveal.css');
+  }
 }

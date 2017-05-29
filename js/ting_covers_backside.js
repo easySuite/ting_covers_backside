@@ -4,7 +4,7 @@
   // Helper function to get information about a given cover place holder.
   var ting_covers_backside_extract_data = function(e) {
     return {
-      id : $(e).data('ting-cover-object-id')
+      id : $(e).attr('ting-object-id')
     };
   };
 
@@ -19,12 +19,10 @@
 
       // Assemble information regarding covers.
       var cover_data = [];
-
       // Extract cover information from the dom.
-      $('.ting-cover:not(.ting-backover-processed)', context).each(function (index, element) {
+      $('.ting-object', context).each(function (index, element) {
         cover_data.push(ting_covers_backside_extract_data(element));
       });
-
       if (cover_data.length > 0) {
         $.ajax({
           url: Drupal.settings.basePath + 'ting/covers/backside',
