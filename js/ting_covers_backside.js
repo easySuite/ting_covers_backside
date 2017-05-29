@@ -34,8 +34,6 @@
           success: function (coverData) {
             $.each(coverData, function (id, data) {
               var $current = $('#work-cover-' + id).parent();
-              $current.html('');
-              $(data.data).appendTo($current);
               $current.parent().closest('.ting-object').removeClass('no-cover');
             });
           }
