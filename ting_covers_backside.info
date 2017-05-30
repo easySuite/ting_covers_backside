@@ -6,6 +6,7 @@ version = 7.x-3.0.3
 dependencies[] = ting
 dependencies[] = ting_covers
 dependencies[] = ting_covers_addi
+configure = admin/config/ting/covers/backside
 scripts[] = js/pdfobject.min.js
 features[ctools][] = strongarm:strongarm:1
 features[features_api][] = api:2
