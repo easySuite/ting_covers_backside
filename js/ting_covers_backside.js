@@ -4,7 +4,7 @@
   // Helper function to get information about a given cover place holder.
   var ting_covers_backside_extract_data = function(e) {
     return {
-      id : $(e).attr('ting-object-id')
+      id : $(e).attr('data-ting-cover-object-id')
     };
   };
 
@@ -20,7 +20,7 @@
       // Assemble information regarding covers.
       var cover_data = [];
       // Extract cover information from the dom.
-      $('.ting-object', context).each(function (index, element) {
+      $('.ting-cover', context).each(function (index, element) {
         cover_data.push(ting_covers_backside_extract_data(element));
       });
       if (cover_data.length > 0) {
@@ -33,15 +33,14 @@
           dataType: 'json',
           success: function (coverData) {
             $.each(coverData, function (id, data) {
-              var $current = $('#work-cover-' + id).parent();
-              $current.parent().closest('.ting-object').removeClass('no-cover');
+              $('div.ting-object').find('[ting-object-id="' + id + '"]').find('.backside-covers-wrapper').replaceWith(data);
             });
           }
         });
 
         // Load PDF file on modal open.
         $(document, context).on('reveal:open', '.reveal-modal', function () {
-          var wrapper;
+          var $wrapper;
           var hash = $(this).data('hash');
           var uri = $(this).children().children().data('uri');
 
@@ -62,16 +61,8 @@
               options.PDFJS_URL = Drupal.settings.basePath + 'profiles/ding2/libraries/pdfjs/web/viewer.html';
             }
 
-            wrapper = $('#reveal-cover-back-' + hash + ' .reveal-cover-back-image');
-            PDFObject.embed(uri, wrapper, options);
-          }
-          else {
-            var cover_hash = $(this).data('cover-hash');
-            var cover_uri = $(this).parent().find('a.ting-cover').data('uri');
-            var image = '<img src="' + cover_uri + '">';
-
-            wrapper = $('#reveal-cover-large-' + cover_hash + ' .reveal-cover-large-image');
-            $(wrapper).once().append(image);
+            $wrapper = $('#reveal-cover-back-' + hash + ' .reveal-cover-back-image');
+            PDFObject.embed(uri, $wrapper, options);
           }
         });
       }

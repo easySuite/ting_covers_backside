@@ -29,7 +29,6 @@
 
   $.fn.reveal = function(options) {
 
-
     var defaults = {
       animation: 'fadeAndPop', //fade, fadeAndPop, none
       animationspeed: 300, //how fast animtions are

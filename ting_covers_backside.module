@@ -15,6 +15,7 @@ function ting_covers_backside_menu() {
     'page callback' => 'ting_covers_backside_objects',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
+    'delivery callback' => 'drupal_json_output',
   );
   $items['admin/config/ting/covers/backside'] = array(
     'title' => 'Backside',
@@ -35,17 +36,8 @@ function ting_covers_backside_menu() {
 function ting_covers_backside_theme($existing, $type, $theme, $path) {
   return array(
     'ting_object_backside' => array(
-      'render element' => 'elements',
       'template' => 'templates/ting-covers-backside',
-      'variables' => array(
-        'close_button' => NULL,
-        'image' => NULL,
-        'front_cover_large_link' => NULL,
-        'back_cover_large_link' => NULL,
-        'front_cover_large_image' => NULL,
-        'back_cover_large_pdf' => NULL,
-        'entity_id' => NULL,
-      ),
+      'variables' => array(),
     ),
   );
 }
@@ -106,50 +98,34 @@ function ting_covers_backside_objects() {
   }
   $backside_covers = ting_covers_backside_get($ids);
 
-  $return = array();
-  foreach ($backside_covers as $id => $path) {
-    $variables = ting_covers_backside_prepare_to_theme(ding_entity_load($id));
-    ting_covers_backside_preprocess_ting_object_cover($variables);
-    $markup = module_invoke('ting_covers_backside', 'ting_object_cover', $variables);
+  $covers = array();
+  foreach ($ids as $id) {
+    // Load front page cover.
+    $path = ting_covers_object_path($id);
+    $front_cover = FALSE;
+    if (file_exists($path)) {
+      $front_cover = image_style_url('ting_cover_large', $path);
+    }
 
-    $return[md5($id)]['data'] = $markup;
+    // Load backside cover.
+    $backside_cover = FALSE;
+    if (in_array($id, array_keys($backside_covers)) && file_exists($backside_covers[$id])) {
+      $backside_cover = file_create_url($backside_covers[$id]);
+    }
+    if ($front_cover || $backside_cover) {
+      $covers[$id] = theme(
+        'ting_object_backside',
+        array(
+          'entity_id' => $id,
+          'hash' => md5($id),
+          'front_cover' => $front_cover,
+          'backside_cover' => $backside_cover,
+        )
+      );
+    }
   }
 
-  // Return all image information.
-  drupal_json_output($return);
-  drupal_exit();
-}
-
-/**
- * Prepare $variables array with which we could render coverwith backside for
- * AJAX request.
- *
- * @param $entity
- *
- * @return array
- */
-function ting_covers_backside_prepare_to_theme($entity) {
-  $covers_style = 'ting_cover_small';
-  $variables = array(
-    'classes' => array(
-      'ting-cover',
-      'ting-cover-processed',
-    ),
-    'data' => array(
-      'ting-cover-object-id' => $entity->ding_entity_id,
-      'ting-cover-style' => $covers_style,
-    ),
-    'elements' => array(
-      '#image_style' => $covers_style,
-      '#object' => $entity,
-      '#theme' => 'ting_object_cover',
-    ),
-    'image_style' => $covers_style,
-    'object' => $entity,
-    'theme_hook_original' => 'ting_object_cover',
-  );
-
-  return $variables;
+  return $covers;
 }
 
 /**
@@ -206,7 +182,6 @@ function ting_covers_backside_get(array $requested_backside_covers) {
 
     foreach ($retrieved as $local_id => $backside_cover) {
       // Try to extract the image url from the result.
-      $source_url = FALSE;
       if ($backside_cover->backsideUri) {
         $source_url = $backside_cover->backsideUri;
         // Return the path to the backside_cover.
@@ -329,201 +304,21 @@ function ting_covers_backside_object_path($object_id) {
 }
 
 /**
- * Implements hook_preprocess_ting_object_cover().
+ * Implements hook_preprocess_HOOK.
  *
- * Override preprocess function for ting_object_cover for backside cover.
+ * Attach modal window wrapper to be replaced with the covers.
+ *
+ * @param $variables
  */
-function ting_covers_backside_preprocess_ting_object_cover(&$variables) {
-  $cover_file_path = FALSE;
-  $backcoverpdf_file_path = FALSE;
-  $object = $variables['object'] = $variables['elements']['#object'];
-  $variables['image_style'] = $image_style = $variables['elements']['#image_style'];
-  $display_modal = FALSE;
-
-  // Set initial values required by the template.
-  $variables['classes'] = array(
-    'ting-cover',
-  );
-  $variables['data'] = array(
-    'ting-cover-object-id' => $object->id,
-    'ting-cover-style' => $variables['image_style'],
-  );
-  $variables['image'] = '';
-
-  $attrs = array();
-  foreach ($variables['data'] as $key => $val) {
-    $attrs['data-' . $key] = $val;
-  }
-
-  // Load front cover.
-  $path = ting_covers_object_path($object->id);
-  if (file_exists($path)) {
-    $cover_file_path = $path;
-  }
-
-  $image_attributes = array(
-    'class' => array('ting-cover', 'reveal-cover'),
-    'title' => t('See large image', array(), array('context' => 'ting_covers')),
-    'aria-label' => t('See large image', array(), array('context' => 'ting_covers')),
-    'data-reveal-id' => 'reveal-cover-large-' . md5($object->id),
-    'data-uri' => image_style_url('ting_cover_large', $path),
-  );
-  if ($cover_file_path != FALSE) {
-    $image_attributes['data-uri'] = image_style_url('ting_cover_large', $cover_file_path);
-  }
-
-  $image_attributes = array_merge($image_attributes, $attrs);
-
-  // Default link if there's no covers cached.
-  $variables['elements']['#image'] = array(
-    '#type' => 'link',
-    '#title' => '',
-    '#href' => '#',
-    '#options' => array(
-      'attributes' => $image_attributes,
-    ),
-  );
-
-  if ($cover_file_path) {
-    $alt = '';
-    if (isset($object->creators)) {
-      $alt = implode( ', ', $object->creators) . ': ' . $object->title;
-    }
-
-    $large_cover_uri = image_style_url('ting_cover_large', $cover_file_path);
-
-    $image_attributes['data-uri'] = $large_cover_uri;
-
-    // Thumbnail image with link to full cover in modal window.
-    $variables['elements']['#image'] = array(
-      '#type' => 'link',
-      '#title' => theme('image_style', array(
-        'style_name' => $image_style,
-        'path' => $cover_file_path,
-        'alt' => $alt,
-      )),
-      '#href' => '#',
-      '#options' => array(
-        'html' => TRUE,
-        'attributes' => $image_attributes,
-      ),
-    );
-
-    $display_modal = in_array($variables['image_style'], array_filter(variable_get('ting_backside_covers_modes', array())));
+function ting_covers_backside_preprocess_field(&$variables) {
+  if ($variables['element']['#field_type'] == 'ting_cover') {
+    $display_modal = in_array($variables['items'][0]['#image_style'], array_filter(variable_get('ting_backside_covers_modes', array())));
     if ($display_modal) {
-      // Add element to DOM only if selected image styles are used.
-      $variables['elements']['#front_cover_large_image'] = array(
-        '#markup' => '<div data-uri="' . $large_cover_uri . '"></div>',
-      );
+      $module_path = drupal_get_path('module', 'ting_covers_backside');
+      $variables['items'][0]['#attached']['js'][] = $module_path . '/js/ting_covers_backside.js';
+      $variables['items'][0]['#attached']['js'][] = $module_path . '/js/jquery.reveal.js';
+      $variables['items'][0]['#attached']['css'][] = $module_path . '/css/reveal.css';
+      $variables['items'][0]['#suffix'] = '<div class="backside-covers-wrapper"></div>';
     }
-
-    // Avoid further javascript processing.
-    $image_classes = array_merge($image_attributes['class'], array('ting-cover-processed', 'ting-backover-processed'));
-    $variables['elements']['#image']['#options']['attributes']['class'] = $image_classes;
-  }
-
-  if ($display_modal) {
-    // Front cover modal link.
-    $options = array(
-      'html' => FALSE,
-      'attributes' => array(
-        'class' => array('cover-front', 'active', 'reveal-cover'),
-        'title' => t('See large cover image', array(), array('context' => 'ting_covers')),
-        'aria-label' => t('See large cover image', array(), array('context' => 'ting_covers')),
-        'data-reveal-id' => 'reveal-cover-large-' . md5($object->id),
-        'data-uri' => image_style_url('ting_cover_large', $cover_file_path),
-      ),
-    );
-    if (!$cover_file_path) {
-      $options['attributes']['style'] = 'display: none';
-    }
-    $variables['elements']['#front_cover_large_link'] = array(
-      '#type' => 'link',
-      '#title' => '',
-      '#href' => '',
-      '#options' => $options,
-    );
-
-    $path = ting_covers_backside_object_path($variables['object']->id);
-    if (file_exists($path)) {
-      $backcoverpdf_file_path = $path;
-      $variables['backside_file'] = $backcoverpdf_file_path;
-    }
-
-    // Backside cover modal window.
-    $options = array(
-      'html' => FALSE,
-      'attributes' => array(
-        'class' => array('cover-back', 'reveal-cover'),
-        'title' => t('See large back cover image', array(), array('context' => 'ting_covers')),
-        'aria-label' => t('See large back cover image', array(), array('context' => 'ting_covers')),
-        'data-reveal-id' => 'reveal-cover-back-' . md5($object->id),
-      ),
-    );
-
-    if (!$backcoverpdf_file_path) {
-      $options['attributes']['style'] = 'display: none';
-    }
-    if ($wrapper = file_stream_wrapper_get_instance_by_uri($backcoverpdf_file_path)) {
-      $backcover_uri = $wrapper->getExternalUrl();
-      $variables['elements']['#back_cover_large_pdf'] = array(
-        '#markup' => '<div data-uri="' . $backcover_uri . '" width="590" height="925"></div>',
-      );
-    }
-    $variables['elements']['#back_cover_large_link'] = array(
-      '#type' => 'link',
-      '#title' => '',
-      '#href' => '',
-      '#options' => $options,
-    );
-    $variables['elements']['#close_button'] = array(
-      '#markup' => '<a class="reveal-cover close-reveal-modal">&#215;</a>',
-    );
-  }
-}
-
-/**
- * Implements hook_theme_registry_alter().
- */
-function ting_covers_backside_theme_registry_alter(&$theme_registry) {
-  if (isset($theme_registry['ting_object_cover'])) {
-    $theme_registry['ting_object_cover']['function'] = 'ting_covers_backside_ting_object_cover';
-  }
-}
-
-/**
- * Implements theme_ting_object_cover().
- *
- * Override theme function for backside cover.
- */
-function ting_covers_backside_ting_object_cover($variables) {
-  $template_vars = array(
-    'close_button' => drupal_render($variables['elements']['#close_button']),
-    'image' => drupal_render($variables['elements']['#image']),
-    'front_cover_large_link' => drupal_render($variables['elements']['#front_cover_large_link']),
-    'back_cover_large_link' => drupal_render($variables['elements']['#back_cover_large_link']),
-    'front_cover_large_image' => drupal_render($variables['elements']['#front_cover_large_image']),
-    'back_cover_large_pdf' => drupal_render($variables['elements']['#back_cover_large_pdf']),
-    'entity_id' => md5($variables['object']->id),
-  );
-
-  $markup = theme('ting_object_backside', $template_vars);
-
-  return $markup;
-}
-
-/**
- * Implements hook_field_display_alter().
- */
-function ting_covers_backside_field_display_alter(&$display, $context) {
-  $display_modal = FALSE;
-  if (!empty($display['settings']['image_style'])) {
-    $display_modal = in_array($display['settings']['image_style'], array_filter(variable_get('ting_backside_covers_modes', array())));
-  }
-  if ($context['field']['field_name'] == 'ting_cover' && $display_modal) {
-    $module_path = drupal_get_path('module', 'ting_covers_backside');
-    drupal_add_js($module_path . '/js/ting_covers_backside.js');
-    drupal_add_js($module_path . '/js/jquery.reveal.js');
-    drupal_add_css($module_path . '/css/reveal.css');
   }
 }
