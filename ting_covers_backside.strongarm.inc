@@ -16,9 +16,9 @@ function ting_covers_backside_strongarm() {
   $strongarm->name = 'ting_backside_covers_modes';
   $strongarm->value = array(
     'ting_cover_small' => 'ting_cover_small',
-    'ding_primary_large' => 'ding_primary_large',
+    'ding_primary_large' => 0,
     'ting_cover_medium' => 'ting_cover_medium',
-    'ding_list_medium' => 'ding_list_medium',
+    'ding_list_medium' => 0,
     'medium' => 0,
   );
   $export['ting_backside_covers_modes'] = $strongarm;
