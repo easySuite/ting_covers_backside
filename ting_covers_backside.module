@@ -1,8 +1,10 @@
 <?php
 /**
  * @file
- * Backside functionality.
+ * Code for the Ting covers backside feature.
  */
+
+include_once 'ting_covers_backside.features.inc';
 
 /**
  * Implements hook_menu().
