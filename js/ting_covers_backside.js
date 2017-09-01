@@ -33,7 +33,7 @@
           dataType: 'json',
           success: function (coverData) {
             $.each(coverData, function (id, data) {
-              $('div.ting-object').find('[ting-object-id="' + id + '"]').find('.backside-covers-wrapper').replaceWith(data);
+              $('div.ting-object').find('[data-ting-cover-object-id="' + id + '"]').next('.backside-covers-wrapper').replaceWith(data);
             });
           }
         });

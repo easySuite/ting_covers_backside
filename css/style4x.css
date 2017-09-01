@@ -5,6 +5,24 @@
   font-weight: normal;
   font-style: normal;
 }
+.ting-object .view-mode-collection-list {
+  box-sizing: border-box;
+  word-wrap: break-word;
+  float: left;
+  margin-left: 0%;
+  padding-right: 10px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  word-wrap: break-word;
+}
+.ting-object .view-mode-collection-list .ting-cover {
+  min-height: 60px;
+  position: relative;
+  width: 100% !important;
+}
+
 .work-cover-selector {
   display: inline-block;
   padding-top: 10px;
@@ -29,12 +47,12 @@
   font-variant: normal;
   text-transform: none;
   line-height: 1;
-  font-size: 32px;
+  font-size: 20px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 .work-cover-selector .cover-front {
-  margin-right: 20px;
+  margin-right: 10px;
 }
 .work-cover-selector .cover-front:before {
   content: "\e919";
@@ -45,7 +63,7 @@
   font-variant: normal;
   text-transform: none;
   line-height: 1;
+  font-size: 20px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 32px;
 }
