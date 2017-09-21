@@ -33,7 +33,7 @@
           dataType: 'json',
           success: function (coverData) {
             $.each(coverData, function (id, data) {
-              $('div.ting-object').find('[ting-object-id="' + id + '"]').find('.backside-covers-wrapper').replaceWith(data);
+              $('div.ting-object').find('[data-ting-cover-object-id="' + id + '"]').next('.backside-covers-wrapper').replaceWith(data);
             });
           }
         });
@@ -51,15 +51,8 @@
               pdfOpenParams: {view: "FitV", page: '1'}
             };
 
-            // Firefox 1.0+
-            var isFirefox = typeof InstallTrigger !== 'undefined';
-
-            var isIE = /*@cc_on!@*/false || !!document.documentMode;
-
-            if (isFirefox || isIE) {
-              options.forcePDFJS = true;
-              options.PDFJS_URL = Drupal.settings.basePath + 'profiles/ding2/libraries/pdfjs/web/viewer.html';
-            }
+            options.forcePDFJS = true;
+            options.PDFJS_URL = Drupal.settings.basePath + 'profiles/ding2/libraries/pdfjs/web/viewer.html';
 
             $wrapper = $('#reveal-cover-back-' + hash + ' .reveal-cover-back-image');
             PDFObject.embed(uri, $wrapper, options);
