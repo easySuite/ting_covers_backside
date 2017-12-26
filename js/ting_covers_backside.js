@@ -35,6 +35,14 @@
             $.each(coverData, function (id, data) {
               $('div.ting-object').find('[data-ting-cover-object-id="' + id + '"]').next('.backside-covers-wrapper').replaceWith(data);
             });
+
+            // As we have problems with positioning of modal on non ting_object
+            // pages, we will move div with cover content before the body
+            // closing tag so it is show normally.
+            var reveal_content = $('.reveal-modal');
+            if (reveal_content.length !== 0) {
+              reveal_content.appendTo('body');
+            }
           }
         });
 

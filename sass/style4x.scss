@@ -27,6 +27,12 @@
     width: 100% !important;
   }
 }
+
+.ding-carousel-item {
+  .work-cover-selector {
+    position: absolute;
+  }
+}
 .work-cover-selector {
   display: inline-block;
   padding-top: 10px;
