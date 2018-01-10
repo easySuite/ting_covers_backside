@@ -57,11 +57,19 @@
 }
 .reveal-modal.reveal-cover-back,
 .reveal-modal.reveal-cover-large {
-  top: 17% !important;
+  top: 155px !important;
   left: 50%;
   position: fixed;
   overflow: hidden
 }
+
+.front.search-form-extended .reveal-modal.reveal-cover-back,
+.front.search-form-extended .reveal-modal.reveal-cover-large,
+.extended-search-is-open .reveal-modal.reveal-cover-back,
+.extended-search-is-open .reveal-modal.reveal-cover-large {
+  top: 240px !important;
+}
+
 @media only screen and (max-width: 768px) {
   .reveal-modal.reveal-cover-back,
   .reveal-modal.reveal-cover-large {
