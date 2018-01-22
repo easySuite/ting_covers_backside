@@ -11,8 +11,11 @@ function ting_covers_backside_admin_settings_form() {
   $instance_info = field_info_instance('ting_object', 'ting_cover', 'ting_object');
   foreach ($instance_info['display'] as $mode_name => $mode) {
     $style = !empty($mode['settings']['image_style']) ? $mode['settings']['image_style'] : FALSE;
-    if ($style) {
-      $styles[$style] = $mode_name;
+    if (!empty($style)) {
+      if ($mode_name == 'default') {
+        $mode_name = 'full';
+      }
+      $styles[$mode_name . ':' . $style] = $mode_name;
     }
   }
 

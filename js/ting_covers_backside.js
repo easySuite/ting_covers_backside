@@ -43,6 +43,17 @@
             if (reveal_content.length !== 0) {
               reveal_content.appendTo('body');
             }
+
+            // Don't display covers icons on carousels.
+            var ding_carousel_items = $('.ding-carousel-item').once();
+            if (ding_carousel_items.length !== 0) {
+              $.map(ding_carousel_items, function(item) {
+                var link = $(item).find('a')[0];
+                if ($(link).children().hasClass('work-cover-selector')) {
+                  $('.ding-carousel .work-cover-selector').remove();
+                }
+              });
+            }
           }
         });
 

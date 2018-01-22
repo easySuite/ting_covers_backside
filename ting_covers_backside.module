@@ -314,7 +314,9 @@ function ting_covers_backside_object_path($object_id) {
  */
 function ting_covers_backside_preprocess_field(&$variables) {
   if ($variables['element']['#field_type'] == 'ting_cover') {
-    $display_modal = in_array($variables['items'][0]['#image_style'], array_filter(variable_get('ting_backside_covers_modes', array())));
+    $image_style = $variables['element']['#view_mode'] . ':' . $variables['items'][0]['#image_style'];
+    $display_modal = in_array($image_style, array_filter(variable_get('ting_backside_covers_modes', array())));
+
     if ($display_modal) {
       $module_path = drupal_get_path('module', 'ting_covers_backside');
       $variables['items'][0]['#attached']['js'][] = $module_path . '/js/ting_covers_backside.js';
