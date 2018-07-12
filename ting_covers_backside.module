@@ -302,7 +302,7 @@ function ting_covers_backside_fetch_backover($filename, $image_url) {
  * The filename is the ID base64 encoded, so we can reverse it later.
  */
 function ting_covers_backside_object_path($object_id) {
-  return file_default_scheme() . '://ting' . DIRECTORY_SEPARATOR . 'backcovers' . DIRECTORY_SEPARATOR . base64_encode($object_id) . '.pdf';
+  return file_default_scheme() . '://ting' . DIRECTORY_SEPARATOR . 'backcovers' . DIRECTORY_SEPARATOR . preg_replace('/[^a-z0-9]/', '-', $object_id) . '.pdf';
 }
 
 /**
