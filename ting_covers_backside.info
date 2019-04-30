@@ -9,7 +9,6 @@ dependencies[] = strongarm
 dependencies[] = ting
 dependencies[] = ting_covers
 dependencies[] = ting_covers_addi
-;scripts[] = js/pdfobject.min.js
 stylesheets[all][] = css/style4x.css
 configure = admin/config/ting/covers/backside
 features[ctools][] = strongarm:strongarm:1
