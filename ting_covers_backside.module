@@ -320,8 +320,6 @@ function ting_covers_backside_preprocess_field(&$variables) {
     if ($display_modal) {
       $module_path = drupal_get_path('module', 'ting_covers_backside');
       $variables['items'][0]['#attached']['js'][] = $module_path . '/js/ting_covers_backside.js';
-      $variables['items'][0]['#attached']['js'][] = $module_path . '/js/jquery.reveal.js';
-      $variables['items'][0]['#attached']['css'][] = $module_path . '/css/reveal.css';
       $variables['items'][0]['#suffix'] = '<div class="backside-covers-wrapper"></div>';
     }
   }
