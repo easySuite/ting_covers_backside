@@ -19,7 +19,7 @@ function ting_covers_backside_strongarm() {
     'collection_primary:ting_cover_medium' => 'collection_primary:ting_cover_medium',
     'full:ting_cover_medium' => 'full:ting_cover_medium',
     'search_result:ting_cover_small' => 'search_result:ting_cover_small',
-    'teaser:ting_cover_medium' => 'teaser:ting_cover_medium',
+    'teaser:ting_cover_medium' => 0,
     'reference_teaser:ting_cover_medium' => 0,
     'ting_reference_preview:ting_cover_medium' => 0,
     'user_list:ting_cover_small' => 0,
