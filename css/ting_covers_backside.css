@@ -1,5 +1,5 @@
 @font-face {
-  font-family: 'icomoon';
+  font-family: 'icomoon@tcb';
   src: url("../fonts/icomoon.eot?3dwsse");
   src: url("../fonts/icomoon.eot?3dwsse#iefix") format("embedded-opentype"), url("../fonts/icomoon.ttf?3dwsse") format("truetype"), url("../fonts/icomoon.woff?3dwsse") format("woff"), url("../fonts/icomoon.svg?3dwsse#icomoon") format("svg");
   font-weight: normal;
@@ -44,7 +44,7 @@
 }
 .work-cover-selector .cover-back:before {
   content: "\e920";
-  font-family: 'icomoon' !important;
+  font-family: 'icomoon@tcb' !important;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -60,7 +60,7 @@
 }
 .work-cover-selector .cover-front:before {
   content: "\e919";
-  font-family: 'icomoon' !important;
+  font-family: 'icomoon@tcb' !important;
   speak: none;
   font-style: normal;
   font-weight: normal;
